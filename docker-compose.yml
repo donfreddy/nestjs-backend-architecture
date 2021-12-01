@@ -1,0 +1,62 @@
+version: '3.4'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: app
+    container_name: app
+    # This defines the restart policy. The default is no,
+    # but we have set the container to restart unless it is stopped.
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: development
+    ports:
+      # This maps port from .env on the host to same port number on the container.
+      - '$PORT:$PORT'
+    command: yarn start:dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    links:
+      - postgres
+  
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin
+  #   restart: always
+  # env_file:
+  #   - .env
+  # networks:
+  #   - nesjs-network
+  # volumes:
+  #   - ./pgdata/pgadmin:/root/.pgadmin
+  # links:
+  #   - postgres
+
+
+  postgres:
+    image: postgres:9.6
+    restart: unless-stopped
+    networks:
+      - nesjs-network
+    container_name: postgres
+    # This tell compose that we would like to add environment variables 
+    # from a file called .env located in the project root directory
+    env_file:
+      - .env
+    environment:
+      # This is the same as the env_file: .env
+      POSTGRES_USER=$POSTGRES_USER
+      POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      POSTGRES_DB=$POSTGRES_DB_NAME
+      PG_DATA=/var/lib/postgresql/data
+    ports:
+      - '$POSTGRES_DB_PORT:$POSTGRES_DB_PORT'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
