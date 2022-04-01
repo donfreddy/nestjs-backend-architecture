@@ -1,4 +1,4 @@
-import { getAccessToken } from '../utils/auth.utils';
+import { getAccessToken } from '../../utils/auth.utils';
 import { NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
 import { NextFunction, Request } from 'express';
 

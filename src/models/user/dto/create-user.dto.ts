@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, IsUrl, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsUrl,
+  MaxLength,
+  MinLength,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -19,5 +27,6 @@ export class CreateUserDto {
 
   @IsUrl()
   @IsString()
+  @IsOptional()
   readonly profilePicUrl?: string;
 }

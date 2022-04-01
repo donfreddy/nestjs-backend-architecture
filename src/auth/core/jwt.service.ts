@@ -1,4 +1,4 @@
-import { User } from './../../user/entities/user.entity';
+import { User } from '../../models/user/entities/user.entity';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { readFile } from 'fs';
 import * as path from 'path';

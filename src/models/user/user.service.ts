@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserRepository } from './repository/user.repository';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
@@ -14,8 +14,8 @@ export class UserService {
     return this.userRepo.findById(id);
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  createUser(createUserDto: CreateUserDto) {
+    return `This action creates a new user: ${JSON.stringify(createUserDto)}`;
   }
 
   findAll() {
