@@ -1,6 +1,6 @@
 export interface IKeystore {
   primaryKey: string;
   secondaryKey: string;
-  client: UserEntity;
+  // client: UserEntity;
   status: boolean;
 }

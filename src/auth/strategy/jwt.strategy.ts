@@ -1,3 +1,4 @@
+/*
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
@@ -24,3 +25,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return user;
   }
 }
+*/

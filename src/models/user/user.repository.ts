@@ -1,5 +1,6 @@
+/*
 import { EntityRepository, Repository, UpdateResult } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User } from './schemas/user.entity';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -50,3 +51,4 @@ export class UserRepository extends Repository<User> {
     return this.update({ id: user.id }, { ...user });
   }
 }
+*/

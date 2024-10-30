@@ -1,17 +1,13 @@
-import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { ApiKey } from './entities/api-key.entity';
-import { ApiKeyEntity } from './serializer/api-key.serializer';
+import { ApiKey } from './schemas/api-key.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ApiKeyService {
-  constructor(
-    @InjectRepository(ApiKey)
-    private apiKeyRepo: Repository<ApiKeyEntity>,
-  ) {}
+  constructor(@InjectModel(ApiKey.name) private apiKeyModel: Model<ApiKey>) {}
 
-  async findOne(id: number): Promise<ApiKeyEntity> {
-    return await this.apiKeyRepo.findOne(id);
+  async findByKey(key: string): Promise<ApiKey | null> {
+    return this.apiKeyModel.findOne({ key: key, status: true }).lean().exec();
   }
 }

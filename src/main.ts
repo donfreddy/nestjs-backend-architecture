@@ -1,11 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { INestApplication } from '@nestjs/common';
+import { configService } from './config/config.service';
+import { ValidationPipe } from './common/pipes';
+import { HttpExceptionFilter } from './common/exceptions';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const port = configService.getPort();
 
-  // app.setGlobalPrefix('api/v1');
-  await app.listen(3000);
+  const app: INestApplication = await NestFactory.create(AppModule);
+  app.enableCors({ origin: configService.getCorsUrl });
+  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new HttpExceptionFilter());
+
+  // Set global path
+  app.setGlobalPrefix('/api');
+
+  await app.listen(port, (): void => {
+    console.log(`🚀 Server running on http://localhost:${port}`);
+  });
 }
 
 void bootstrap();

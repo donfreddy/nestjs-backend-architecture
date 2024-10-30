@@ -1,4 +1,5 @@
-import { User } from '../../models/user/entities/user.entity';
+/*
+import { User } from '../../models/user/schemas/user.entity';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { readFile } from 'fs';
 import * as path from 'path';
@@ -21,26 +22,26 @@ export class JWTService {
     return promisify(readFile)(filePath, 'utf8');
   }
 
-  /**
+  /!**
    * This methode generate a token with the payload data
    *
    * @param payload The payload data
    * @returns
-   */
-  private async encode(payload: JwtPayload): Promise<string> {
+   *!/
+/!*  private async encode(payload: JwtPayload): Promise<string> {
     const cert = await this.readPrivateKey();
     if (!cert) {
       throw new HttpException('Token generate failure', HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return promisify(sign)({ ...payload }, cert, { algorithm: 'RS256' });
-  }
+  }*!/
 
-  /**
+  /!**
    * This methode check the token and return the payload data when the token is valid
    *
    * @param token The token to check
    * @returns
-   */
+   *!/
   public async validate(token: string): Promise<JwtPayload> {
     const cert = await this.readPublicKey();
     try {
@@ -53,12 +54,12 @@ export class JWTService {
     }
   }
 
-  /**
+  /!**
    * Return the decoded payload if the token is valid and even if it's expired
    *
    * @param token The token to use for decoding the payload
    * @returns
-   */
+   *!/
   public async decode(token: string): Promise<JwtPayload> {
     const cert = await this.readPublicKey();
     try {
@@ -68,12 +69,12 @@ export class JWTService {
     }
   }
 
-  /**
+  /!**
    * Validate the token data
    *
    * @param payload The token data
    * @returns
-   */
+   *!/
   public validateTokenData(payload: JwtPayload): boolean {
     const { sub, iss, aud, prm } = payload;
     const localIss = this.configService.get<string>('tokenInfo.issuer');
@@ -86,14 +87,14 @@ export class JWTService {
     return true;
   }
 
-  /**
+  /!**
    * Create the access token and the refresh token for the user
    *
    * @param user The user to create the token for
    * @param accessTokenKey The key to use for the access token
    * @param refreshTokenKey The key to use for the refresh token
    * @returns
-   */
+   *!/
   public async createToken(
     user: User,
     accessTokenKey: string,
@@ -132,3 +133,4 @@ export class JWTService {
     return { accessToken, refreshToken } as Tokens;
   }
 }
+*/

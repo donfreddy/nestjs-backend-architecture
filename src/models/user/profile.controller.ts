@@ -14,11 +14,11 @@ export class ProfileController {
   // Get public profile by id
   @Get('/public/:id')
   getPublicProfile(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    //return this.userService.findOne(+id);
   }
 
   @Put('')
   updateProfile(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+    //return this.userService.update(+id, updateUserDto);
   }
 }

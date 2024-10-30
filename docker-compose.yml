@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.9'
 
 services:
   app:
@@ -11,52 +11,58 @@ services:
     # but we have set the container to restart unless it is stopped.
     restart: unless-stopped
     env_file: .env
-    environment:
-      NODE_ENV: development
     ports:
       # This maps port from .env on the host to same port number on the container.
-      - '$PORT:$PORT'
+      - '${PORT}:${PORT}'
     command: yarn start:dev
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     links:
-      - postgres
+      - mongo
+      - redis
+    depends_on:
+      - mongo
+      - redis
   
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin
-  #   restart: always
-  # env_file:
-  #   - .env
-  # networks:
-  #   - nesjs-network
-  # volumes:
-  #   - ./pgdata/pgadmin:/root/.pgadmin
-  # links:
-  #   - postgres
 
-
-  postgres:
-    image: postgres:9.6
+  mongo:
+    # To create this service, Compose will pull the mongo
+    image: mongo:7.0.4
+    container_name: mongo
     restart: unless-stopped
-    networks:
-      - nesjs-network
-    container_name: postgres
-    # This tell compose that we would like to add environment variables 
-    # from a file called .env located in the project root directory
-    env_file:
-      - .env
+    # This tells Compose that we would like to add environment variables
+    # from a file called .env, located in our build context.
+    env_file: .env
     environment:
-      # This is the same as the env_file: .env
-      POSTGRES_USER=$POSTGRES_USER
-      POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-      POSTGRES_DB=$POSTGRES_DB_NAME
-      PG_DATA=/var/lib/postgresql/data
+      # MONGO_INITDB_ROOT_USERNAME and MONGO_INITDB_ROOT_PASSWORD together create
+      # a root user in the admin authentication database and ensure that authentication is enabled
+      # when the container starts. We have set MONGO_INITDB_ROOT_USERNAME and MONGO_INITDB_ROOT_PASSWORD
+      # using the values from our .env file, which we pass to the db service using the env_file option.
+      - MONGO_INITDB_ROOT_USERNAME=$DB_ADMIN
+      - MONGO_INITDB_ROOT_PASSWORD=$DB_ADMIN_PWD
+      - MONGO_INITDB_DATABASE=$DB_NAME
     ports:
-      - '$POSTGRES_DB_PORT:$POSTGRES_DB_PORT'
+      - '${DB_PORT}:27017'
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./addons/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      #- ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      # The named volume dbdata will persist the data stored in Mongo’s default data directory, /data/db.
+      # This will ensure that you don’t lose data in cases where you stop or remove containers.
+      - db_data:/data/db
+
+  redis:
+    image: redis:7.2.3
+    container_name: redis
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass $REDIS_PASSWORD
+    volumes:
+      - cache:/data/cache
 
 volumes:
-  pgdata:
+  db_data:
+  cache:
+    driver: local

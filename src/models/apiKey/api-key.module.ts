@@ -1,10 +1,10 @@
 import { ApiKeyService } from './api-key.service';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiKey } from './entities/api-key.entity';
+import { ApiKey, ApiKeySchema } from './schemas/api-key.schema';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ApiKey])],
+  imports: [MongooseModule.forFeature([{ name: ApiKey.name, schema: ApiKeySchema }])],
   providers: [ApiKeyService],
   exports: [ApiKeyService],
 })
