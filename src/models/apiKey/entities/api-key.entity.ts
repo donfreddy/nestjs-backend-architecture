@@ -28,5 +28,5 @@ export class ApiKey implements IApiKey {
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatetAt: Date;
+  updatedAt: Date;
 }

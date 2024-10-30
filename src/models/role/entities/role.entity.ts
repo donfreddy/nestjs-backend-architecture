@@ -33,4 +33,5 @@ export class Role implements IApiKey {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatetAt: Date;
+  key: string;
 }
