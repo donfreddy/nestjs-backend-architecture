@@ -27,6 +27,10 @@ class ConfigService {
     return parseInt(this.getValue('PORT') || '3000', 10);
   }
 
+  public getFallbackLanguage() {
+    return this.getValue('FALLBACK_LANGUAGE') || 'en';
+  }
+
   public getTimeZone() {
     return this.getValue('TZ');
   }
