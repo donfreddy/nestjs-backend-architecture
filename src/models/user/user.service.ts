@@ -23,7 +23,7 @@ export class UserService {
     const now = new Date();
 
     const role = await this.roleService.findByCode(roleCode);
-    if (!role) throw new InternalServerErrorException('Role must be defined');
+    if (!role) throw new InternalServerErrorException({ key: 'auth.error.role_must_be_defined' });
 
     user.roles = [role];
     user.createdAt = user.updatedAt = now;

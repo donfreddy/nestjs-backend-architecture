@@ -1,10 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema, Document } from 'mongoose';
-import { IKeystore } from '../interface/keystore.interface';
 import { User } from '../../user/schemas/user.schema';
 
 @Schema({ collection: 'keystores' })
-export class Keystore implements IKeystore {
+export class Keystore {
   @Prop()
   primaryKey: string;
 

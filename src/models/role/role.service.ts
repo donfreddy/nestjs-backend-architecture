@@ -8,7 +8,7 @@ export class RoleService {
   constructor(@InjectModel(Role.name) private readonly model: Model<Role>) {}
 
   async findByCode(code: string): Promise<Role | null> {
-    return this.model.findOne({ code: code, status: true }).lean().exec();
+    return this.model.findOne({ code: code, status: true }).select('+code').lean().exec();
   }
 
   async findByCodes(codes: string[]): Promise<Role[]> {

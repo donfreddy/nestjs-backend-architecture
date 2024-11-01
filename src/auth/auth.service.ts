@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto, SignupDto } from './dto/auth.dto';
 import { UserService } from '../models/user/user.service';
 import { comparePasswords, getTokenKey, hashPassword, RoleCode } from '../common/helpers';
@@ -113,7 +118,7 @@ export class AuthService {
     );
 
     // Check if the tokens have been created successfully.
-    // if (!accessToken || !refreshToken) throw new InternalError();
+    if (!accessToken || !refreshToken) throw new InternalServerErrorException();
 
     // Return the tokens
     return { accessToken, refreshToken } as Tokens;
