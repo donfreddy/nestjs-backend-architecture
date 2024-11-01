@@ -6,12 +6,12 @@ import { User } from '../user/schemas/user.schema';
 
 @Injectable()
 export class KeystoreService {
-  constructor(@InjectModel(Keystore.name) private keystoreModel: Model<Keystore>) {}
+  constructor(@InjectModel(Keystore.name) private model: Model<Keystore>) {}
 
   async create(client: User, primaryKey: string, secondaryKey: string): Promise<Keystore> {
     const now = new Date();
 
-    const createdKeystore = new this.keystoreModel({
+    const createdKeystore = new this.model({
       client: client,
       primaryKey: primaryKey,
       secondaryKey: secondaryKey,
@@ -24,7 +24,7 @@ export class KeystoreService {
   }
 
   async find(client: User, primaryKey: string, secondaryKey: string): Promise<Keystore | null> {
-    return this.keystoreModel
+    return this.model
       .findOne({
         client: client,
         primaryKey: primaryKey,
@@ -35,9 +35,9 @@ export class KeystoreService {
   }
 
   async findFoyKey(client: User, key: string): Promise<Keystore | null> {
-    return this.keystoreModel
+    return this.model
       .findOne({
-        client: client,
+        // client: client,
         primaryKey: key,
         status: true,
       })
@@ -46,10 +46,10 @@ export class KeystoreService {
   }
 
   async remove(id: Types.ObjectId): Promise<Keystore | null> {
-    return this.keystoreModel.findByIdAndDelete(id).lean().exec();
+    return this.model.findByIdAndDelete(id).lean().exec();
   }
 
   async removeAllForClient(client: User) {
-    return this.keystoreModel.deleteMany({ client: client }).exec();
+    return this.model.deleteMany({ client: client }).exec();
   }
 }

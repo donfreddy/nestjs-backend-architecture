@@ -1,11 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { IApiKey } from '../interface/api-key.interface';
-
-export type ApiKeyDocument = HydratedDocument<ApiKey>;
+import { Document } from 'mongoose';
 
 @Schema({ collection: 'api_keys' })
-export class ApiKey implements IApiKey {
+export class ApiKey  {
   @Prop({ length: 1024, unique: true })
   key: string;
 
@@ -26,3 +23,5 @@ export class ApiKey implements IApiKey {
 }
 
 export const ApiKeySchema = SchemaFactory.createForClass(ApiKey);
+
+export type ApiKeyDocument = ApiKey & Document;

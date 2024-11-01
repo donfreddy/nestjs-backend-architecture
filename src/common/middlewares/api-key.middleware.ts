@@ -1,18 +1,22 @@
-import { HttpException, HttpStatus, NestMiddleware } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
+import { ForbiddenException, NestMiddleware } from '@nestjs/common';
+import { NextFunction, Response } from 'express';
+import { Header } from '../helpers';
+import { PublicRequest } from '../../types/app-request';
+import { ApiKeyService } from '../../models/apiKey/api-key.service';
 
 export class ApikeyMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+  constructor(private readonly apiKeyService: ApiKeyService) {}
+
+  async use(req: PublicRequest, res: Response, next: NextFunction) {
     // Get API key from headers
-    const apiKey = req.headers['x-api-key'].toString();
+    const key = req.headers[Header.API_KEY]?.toString();
 
-    if (!apiKey) {
-      throw new HttpException('API key is missing', HttpStatus.UNAUTHORIZED);
-    }
+    if (!key) throw new ForbiddenException({ key: 'auth.error.permission_denied' });
 
-    if (apiKey !== 'secret') {
-      throw new HttpException('Invalid API key', HttpStatus.UNAUTHORIZED);
-    }
+    const apiKey = await this.apiKeyService.findByKey(key);
+    if (!apiKey) throw new ForbiddenException({ key: 'auth.error.permission_denied' });
+
+    req.apiKey = apiKey;
 
     // Call next if the middleware is successful
     next();

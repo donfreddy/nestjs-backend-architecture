@@ -1,3 +1,5 @@
+import { HttpStatus } from '@nestjs/common';
+
 export const enum Env {
   DEV = 'dev',
   STG = 'stg',
@@ -15,9 +17,29 @@ export const enum Gender {
   UNSPECIFIED = 'Unspecified',
 }
 
-export const enum RoleCode {
+export enum RoleCode {
   LEARNER = 'LEARNER',
   WRITER = 'WRITER',
   EDITOR = 'EDITOR',
   ADMIN = 'ADMIN',
+}
+
+export const enum StatusCode {
+  SUCCESS = '10000',
+  FAILURE = '10001',
+  RETRY = '10002',
+  INVALID_ACCESS_TOKEN = '10003',
+}
+
+export enum ErrorType {
+  BAD_TOKEN = 'BadTokenError',
+  TOKEN_EXPIRED = 'TokenExpiredError',
+  UNAUTHORIZED = 'AuthFailureError',
+  ACCESS_TOKEN = 'AccessTokenError',
+  INTERNAL = 'InternalError',
+  NOT_FOUND = 'NotFoundError',
+  NO_ENTRY = 'NoEntryError',
+  NO_DATA = 'NoDataError',
+  BAD_REQUEST = 'BadRequestError',
+  FORBIDDEN = 'ForbiddenError',
 }

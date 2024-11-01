@@ -1,10 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { configService } from './config/config.service';
+import { ApiResponse } from './common/decorators';
 
 @Controller()
 export class AppController {
   @Get()
-  getHello(): object {
+  @ApiResponse({ key: 'common.success' })
+  getHello() {
     return {
       project: 'NestJS Backend Architecture',
       description: 'The architecture of a NodeJS backend application using NestJS framework',
@@ -12,7 +14,7 @@ export class AppController {
       version: '1.0.0',
       api_version: 'v1',
       license: 'MIT',
-      documentation: 'https://documenter.getpostman.com/view/10623806/TzJx8z1m',
+      documentation: 'https://documenter.getpostman.com/view/9815708/2sAY4vghgt',
       status: 'active',
       environment: configService.getNodeEnv(),
       author: {

@@ -1,29 +1,34 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '../models/user/dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto, SignupDto } from './dto/auth.dto';
+import { ApiResponse } from '../common/decorators';
+import { ProtectedRequest } from '../types/app-request';
 
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() user: LoginDto) {
-    return this.authService.login(user);
+  @ApiResponse({ key: 'auth.success.login' })
+  async login(@Body() inputs: LoginDto) {
+    return this.authService.login(inputs);
   }
 
   @Post('signup')
-  async signup(@Body() user: CreateUserDto) {
-    return this.authService.signup(user);
+  @ApiResponse({ key: 'auth.success.signup' })
+  async signup(@Body() inputs: SignupDto) {
+    return this.authService.signup(inputs);
   }
 
   @Post('logout')
-  async logout() {
-    return this.authService.logout();
+  @ApiResponse({ key: 'auth.success.logout' })
+  async logout(@Req() req: ProtectedRequest) {
+    return this.authService.logout(req.keystore);
   }
 
   @Post('refresh')
-  async refresh() {
+  @ApiResponse({ key: 'auth.success.token_issued' })
+  async refresh(@Req() req: ProtectedRequest) {
     return this.authService.refresh();
   }
 }

@@ -1,9 +1,12 @@
+import { Request } from 'express';
+import { ApiKey } from '../models/apiKey/schemas/api-key.schema';
+
 declare interface PublicRequest extends Request {
-  apiKey: string;
+  apiKey: ApiKey;
 }
 
 declare interface RoleRequest extends PublicRequest {
-  currentRoleCode: string;
+  currentRoleCodes: string[];
 }
 
 declare interface ProtectedRequest extends RoleRequest {

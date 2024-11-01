@@ -1,9 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as Schema2 } from 'mongoose';
+import { Schema as MongooseSchema, Document } from 'mongoose';
 import { IKeystore } from '../interface/keystore.interface';
 import { User } from '../../user/schemas/user.schema';
-
-export type KeystoreDocument = HydratedDocument<Keystore>;
 
 @Schema({ collection: 'keystores' })
 export class Keystore implements IKeystore {
@@ -13,7 +11,7 @@ export class Keystore implements IKeystore {
   @Prop()
   secondaryKey: string;
 
-  @Prop({ type: { type: Schema2.Types.ObjectId, ref: 'User' } })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   client: User;
 
   @Prop({ default: true })
@@ -27,3 +25,5 @@ export class Keystore implements IKeystore {
 }
 
 export const KeystoreSchema = SchemaFactory.createForClass(Keystore);
+
+export type KeystoreDocument = Keystore & Document;

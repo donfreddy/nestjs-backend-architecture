@@ -1,16 +1,16 @@
 /*
-import { User } from '../../models/user/schemas/user.entity';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { readFile } from 'fs';
 import * as path from 'path';
 import { sign, verify } from 'jsonwebtoken';
 import { promisify } from 'util';
 import { JwtPayload } from './jwt-playload';
-import { ConfigService } from '@nestjs/config';
+import { User } from '../../models/user/schemas/user.schema';
+import { InternalError } from '../../common/helpers';
 
 @Injectable()
 export class JWTService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor() {}
 
   private readPublicKey(): Promise<string> {
     const filePath = path.join(__dirname, '../../../keys/public.pem');
@@ -28,13 +28,13 @@ export class JWTService {
    * @param payload The payload data
    * @returns
    *!/
-/!*  private async encode(payload: JwtPayload): Promise<string> {
+  private async encode(payload: JwtPayload): Promise<string> {
     const cert = await this.readPrivateKey();
     if (!cert) {
       throw new HttpException('Token generate failure', HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return promisify(sign)({ ...payload }, cert, { algorithm: 'RS256' });
-  }*!/
+  }
 
   /!**
    * This methode check the token and return the payload data when the token is valid
@@ -100,37 +100,34 @@ export class JWTService {
     accessTokenKey: string,
     refreshTokenKey: string,
   ): Promise<Tokens> {
-    const isser = this.configService.get<string>('tokenInfo.issuer');
-    const audience = this.configService.get<string>('tokenInfo.audience');
-    const accessTokenValidityDays = this.configService.get<number>(
-      'tokenInfo.accessTokenValidityDays',
-    );
-    const refreshTokenValidityDays = this.configService.get<number>(
-      'tokenInfo.refreshTokenValidityDays',
-    );
+    /!*const tokenInfo = configService.getTokenInfo();
+    const issuer = tokenInfo.issuer;
+    const audience = tokenInfo.audience;
+    const accessTokenValidity = tokenInfo.accessTokenValidity;
+    const refreshTokenValidity = tokenInfo.refreshTokenValidity;*!/
 
     // Create the access token
     const accessToken = await this.encode(
-      new JwtPayload(isser, audience, user.id.toString(), accessTokenKey, accessTokenValidityDays),
+      new JwtPayload(issuer, audience, user.email, accessTokenKey, accessTokenValidity),
     );
+
     // Create the refresh token
     const refreshToken = await this.encode(
-      new JwtPayload(
-        isser,
-        audience,
-        user.id.toString(),
-        refreshTokenKey,
-        refreshTokenValidityDays,
-      ),
+      new JwtPayload(issuer, audience, user.email, refreshTokenKey, refreshTokenValidity),
     );
 
     // Check if the tokens have been created successfully.
-    if (!accessToken || !refreshToken) {
-      throw new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    if (!accessToken || !refreshToken) throw new InternalError();
 
     // Return the tokens
     return { accessToken, refreshToken } as Tokens;
   }
+
+  /!*private async generateToken(user: User): Promise<{ user: User; token: string }> {
+  const payload: JwtPayload = { sub: user.id, email: user.email };
+  const token = this.jwt.sign(payload);
+
+  return { user, token };
+}*!/
 }
 */

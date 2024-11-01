@@ -5,14 +5,14 @@ import { Role } from './schemas/role.schema';
 
 @Injectable()
 export class RoleService {
-  constructor(@InjectModel(Role.name) private roleModel: Model<Role>) {}
+  constructor(@InjectModel(Role.name) private readonly model: Model<Role>) {}
 
   async findByCode(code: string): Promise<Role | null> {
-    return this.roleModel.findOne({ code: code, status: true }).lean().exec();
+    return this.model.findOne({ code: code, status: true }).lean().exec();
   }
 
   async findByCodes(codes: string[]): Promise<Role[]> {
-    return this.roleModel
+    return this.model
       .find({ code: { $in: codes }, status: true })
       .lean()
       .exec();
