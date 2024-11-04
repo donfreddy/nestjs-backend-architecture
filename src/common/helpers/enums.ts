@@ -17,6 +17,6 @@ export const enum StatusCode {
   INVALID_ACCESS_TOKEN = '10003',
 }
 
-export enum Permission {
+export enum PermissionEnum {
   GENERAL = 'GENERAL',
 }

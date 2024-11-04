@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as Schema2 } from 'mongoose';
-import { Permission } from '../../../common/helpers';
+import { PermissionEnum } from '../../../common/helpers';
 
 @Schema({ collection: 'api_keys' })
 export class ApiKey {
@@ -12,7 +12,7 @@ export class ApiKey {
     type: [
       {
         type: Schema2.Types.String,
-        enum: Object.values(Permission),
+        enum: Object.values(PermissionEnum),
       },
     ],
   })
