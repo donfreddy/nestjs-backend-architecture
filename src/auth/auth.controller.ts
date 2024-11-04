@@ -1,9 +1,11 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, SignupDto } from './dto/auth.dto';
-import { ApiResponse } from '../common/decorators';
+import { ApiResponse, Permission } from '../common/decorators';
 import { ProtectedRequest } from '../types/app-request';
+import { AuthGuard } from '../common/guards';
 
+@Permission('GENERAL')
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -20,7 +22,8 @@ export class AuthController {
     return this.authService.signup(inputs);
   }
 
-  @Post('logout')
+  @Delete('logout')
+  @UseGuards(AuthGuard)
   @ApiResponse({ key: 'auth.success.logout' })
   async logout(@Req() req: ProtectedRequest) {
     return this.authService.logout(req.keystore);

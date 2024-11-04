@@ -1,0 +1,22 @@
+{
+  "bat_request": "Bad request",
+  "unauthorized": "Unauthorized",
+  "forbidden": "Forbidden",
+  "not_found": "Not found",
+  "method_not_allowed": "Method not allowed",
+  "not_acceptable": "Not acceptable",
+  "proxy_authentication_required": "Proxy authentication required",
+  "request_timeout": "Request timeout",
+  "conflict": "Conflict",
+  "not_implemented": "Not implemented",
+  "service_unavailable": "Service unavailable",
+  "gone": "Gone",
+  "length_required": "Length required",
+  "precondition_failed": "Precondition failed",
+  "payload_too_large": "Payload too large",
+  "uri_too_long": "URI too long",
+  "unsupported_media_type": "Unsupported media type",
+  "range_not_satisfiable": "Range not satisfiable",
+  "expectation_failed": "Expectation failed",
+  "internal_server_error": "Internal server error"
+}

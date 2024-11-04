@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Keystore } from '../keystore/schemas/keystore.schema';
 import { RoleService } from '../role/role.service';
 import { KeystoreService } from '../keystore/keystore.service';
@@ -11,7 +11,7 @@ export class UserService {
   constructor(
     private readonly roleService: RoleService,
     private readonly keystoreService: KeystoreService,
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(User.name) private model: Model<User>,
   ) {}
 
   async create(
@@ -27,7 +27,7 @@ export class UserService {
 
     user.roles = [role];
     user.createdAt = user.updatedAt = now;
-    const createdUser = await this.userModel.create(user);
+    const createdUser = await this.model.create(user);
 
     const keystore = await this.keystoreService.create(
       createdUser,
@@ -41,8 +41,21 @@ export class UserService {
     };
   }
 
+  // contains critical information of the user
+  async findById(id: Types.ObjectId): Promise<User | null> {
+    return this.model
+      .findOne({ _id: id, status: true })
+      .select('+email +password +roles')
+      .populate({
+        path: 'roles',
+        match: { status: true },
+      })
+      .lean()
+      .exec();
+  }
+
   async findByEmail(email: string): Promise<User | null> {
-    return this.userModel
+    return this.model
       .findOne({ email: email })
       .select(
         '+email +password +roles +gender +dob +grade +country +state +city +school +bio +hobbies',
@@ -57,6 +70,6 @@ export class UserService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.model.find().exec();
   }
 }

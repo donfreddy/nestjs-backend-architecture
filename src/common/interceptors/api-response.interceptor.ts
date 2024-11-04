@@ -25,15 +25,14 @@ export function ApiResponseInterceptor<T>(msg: IMessage): Type<InterceptApiRespo
       next: CallHandler,
     ): Promise<Observable<ApiResponse<T>>> {
       const ctx: HttpArgumentsHost = context.switchToHttp();
-      const lang = ctx.getRequest().i18nLang;
-      const message = await this.i18n.t(msg.key || 'common.success', {
+      const lang = ctx.getRequest().i18nLang as string;
+      const message = (await this.i18n.t(msg.key || 'common.success', {
         lang,
         args: msg.args,
-      });
+      })) as string;
 
       return next.handle().pipe(
         map((data: T) => ({
-          success: true,
           status_code: StatusCode.SUCCESS,
           message: message,
           data: JSON.parse(

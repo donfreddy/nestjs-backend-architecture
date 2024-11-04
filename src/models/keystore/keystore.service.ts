@@ -37,7 +37,7 @@ export class KeystoreService {
   async findFoyKey(client: User, key: string): Promise<Keystore | null> {
     return this.model
       .findOne({
-        // client: client,
+        client: client,
         primaryKey: key,
         status: true,
       })

@@ -1,3 +1,22 @@
 {
-  "success": "Success"
+  "bat_request": "Mauvaise requête",
+  "unauthorized": "Non autorisé",
+  "forbidden": "Interdit",
+  "not_found": "Non trouvé",
+  "method_not_allowed": "Méthode non autorisée",
+  "not_acceptable": "Non acceptable",
+  "proxy_authentication_required": "Authentification proxy requise",
+  "request_timeout": "Délai de la demande",
+  "conflict": "Conflit",
+  "not_implemented": "Non implémenté",
+  "service_unavailable": "Service indisponible",
+  "gone": "Parti",
+  "length_required": "Longueur requise",
+  "precondition_failed": "Échec de la condition préalable",
+  "payload_too_large": "Charge utile trop importante",
+  "uri_too_long": "URI trop long",
+  "unsupported_media_type": "Type de support non pris en charge",
+  "range_not_satisfiable": "Plage non satisfaisable",
+  "expectation_failed": "Échec de l'attente",
+  "internal_server_error": "Erreur interne du serveur"
 }

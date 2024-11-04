@@ -11,21 +11,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
   async catch(exception: HttpException, host: ArgumentsHost): Promise<void> {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const lang = ctx.getRequest().i18nLang;
+    const lang = (ctx.getRequest().i18nLang as string) ?? 'en';
     const status = exception.getStatus();
     let message = exception.getResponse() as IMessage;
     const statusCode = status == 401 ? StatusCode.INVALID_ACCESS_TOKEN : StatusCode.FAILURE;
 
     if (message.key) {
+      console.log(lang);
       message = await this.i18n.translate(message.key, { lang, args: message.args });
       response.status(status).json({
-        success: false,
         status_code: statusCode,
         message: message,
       });
     } else {
       response.status(status).json({
-        success: false,
         status_code: statusCode,
         message: exception.message,
       });

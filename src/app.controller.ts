@@ -1,10 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { configService } from './config/config.service';
-import { ApiResponse } from './common/decorators';
+import { ApiResponse, Permission } from './common/decorators';
+import { RoleCode } from './common/helpers';
+import { Auth } from './common/decorators';
 
 @Controller()
 export class AppController {
   @Get()
+  @Permission('GENERAL')
+  @Auth(RoleCode.LEARNER)
   @ApiResponse({ key: 'common.success' })
   getHello() {
     return {

@@ -3,13 +3,13 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { LoginDto, SignupDto } from './dto/auth.dto';
 import { UserService } from '../models/user/user.service';
 import { comparePasswords, getTokenKey, hashPassword, RoleCode } from '../common/helpers';
 import * as _ from 'lodash';
-import { User, UserDocument } from '../models/user/schemas/user.schema';
+import { User } from '../models/user/schemas/user.schema';
 import { configService } from '../config/config.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './core/jwt-playload';
@@ -36,7 +36,7 @@ export class AuthService {
 
     const isMatch = await comparePasswords(password, user.password);
     if (!isMatch) {
-      throw new UnauthorizedException({ key: 'auth.error.auth_failure' });
+      throw new NotFoundException({ key: 'auth.error.auth_failure' });
     }
 
     const accessTokenKey = getTokenKey();
@@ -86,10 +86,8 @@ export class AuthService {
   }
 
   async logout(keyStore: Keystore) {
-    const keystore = await this.keystoreService.findFoyKey(keyStore.client, keyStore.primaryKey);
-    if (keyStore) {
-      await this.keystoreService.remove(keyStore['_id']);
-    }
+    await this.keystoreService.remove(keyStore._id);
+    return { logout: true };
   }
 
   refresh() {
@@ -118,7 +116,9 @@ export class AuthService {
     );
 
     // Check if the tokens have been created successfully.
-    if (!accessToken || !refreshToken) throw new InternalServerErrorException();
+    if (!accessToken || !refreshToken) {
+      throw new InternalServerErrorException({ key: 'request.internal_server_error' });
+    }
 
     // Return the tokens
     return { accessToken, refreshToken } as Tokens;
@@ -127,7 +127,10 @@ export class AuthService {
   private async generateToken(payload: JwtPayload): Promise<string> {
     const filePath = path.join(__dirname, '../../keys/private.pem');
     const cert = await promisify(readFile)(filePath, 'utf8');
-    // if (!cert) throw new InternalError('Token generation failure');
+    if (!cert) {
+      throw new InternalServerErrorException({ key: 'auth.error.token_generation_failure' });
+    }
+
     return this.jwtService.signAsync(
       { ...payload },
       {

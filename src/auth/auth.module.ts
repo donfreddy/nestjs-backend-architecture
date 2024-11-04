@@ -8,5 +8,6 @@ import { UserModule } from '../models/user/user.module';
   imports: [UserModule],
   controllers: [AuthController],
   providers: [AuthService, JwtService,],
+  exports: [ JwtService,],
 })
 export class AuthModule {}

@@ -1,13 +1,28 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as Schema2 } from 'mongoose';
+import { Permission } from '../../../common/helpers';
 
 @Schema({ collection: 'api_keys' })
-export class ApiKey  {
+export class ApiKey {
   @Prop({ length: 1024, unique: true })
   key: string;
 
+  @Prop({
+    required: true,
+    type: [
+      {
+        type: Schema2.Types.String,
+        enum: Object.values(Permission),
+      },
+    ],
+  })
+  permissions: string[];
+
   @Prop({ length: 100 })
   version: number;
+
+  @Prop()
+  comments: string[];
 
   @Prop()
   metadata: string;

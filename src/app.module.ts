@@ -1,6 +1,8 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { HeaderResolver, I18nModule } from 'nestjs-i18n';
 import * as path from 'path';
+import * as helmet from 'helmet';
+import cors from 'cors';
 import { AppController } from './app.controller';
 import { UserModule } from './models/user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -9,8 +11,10 @@ import { KeystoreModule } from './models/keystore/keystore.module';
 import { RoleModule } from './models/role/role.module';
 import { BlogModule } from './models/blog/blog.module';
 import { DatabaseModule } from './database/database.module';
-import { LogsMiddleware } from './common/middlewares';
+import { ApikeyMiddleware, LogsMiddleware } from './common/middlewares';
 import { configService } from './config/config.service';
+import { PermissionGuard } from './common/guards/permission.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -37,10 +41,16 @@ import { configService } from './config/config.service';
     BlogModule,
     DatabaseModule,
   ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
+  ],
   controllers: [AppController],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LogsMiddleware).forRoutes('*');
+    consumer.apply(LogsMiddleware, cors, helmet(), ApikeyMiddleware).forRoutes('*');
   }
 }
