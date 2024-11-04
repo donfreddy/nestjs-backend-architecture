@@ -1,11 +1,10 @@
 import { Body, Controller, Delete, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, SignupDto } from './dto/auth.dto';
+import { LoginDto, RefreshTokenDto, SignupDto } from './dto/auth.dto';
 import { ApiResponse, Permission } from '../common/decorators';
 import { ProtectedRequest } from '../types/app-request';
 import { AuthGuard } from '../common/guards';
-import { PermissionEnum } from '../common/helpers';
-
+import { getAccessToken, PermissionEnum } from '../common/helpers';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -35,8 +34,10 @@ export class AuthController {
 
   @Post('refresh')
   @Permission(PermissionEnum.GENERAL)
-  @ApiResponse({ key: 'auth.success.token_issued' })
-  async refresh(@Req() req: ProtectedRequest) {
-    return this.authService.refresh();
+  @UseGuards(AuthGuard)
+  @ApiResponse({ key: 'auth.success.token_issued' }, HttpStatus.OK)
+  async refresh(@Req() req: ProtectedRequest, @Body() inputs: RefreshTokenDto) {
+    const accessToken = getAccessToken(req.headers.authorization);
+    return this.authService.refresh(accessToken, inputs.refreshToken);
   }
 }

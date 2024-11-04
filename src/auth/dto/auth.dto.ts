@@ -33,6 +33,12 @@ export class SignupDto {
 }
 
 
+export class RefreshTokenDto {
+  @IsNotEmpty()
+  @IsString()
+  refreshToken: string;
+}
+
 export class ForgotPasswordDto {
   @IsNotEmpty()
   @IsEmail()

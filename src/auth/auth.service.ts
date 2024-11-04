@@ -4,10 +4,17 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { LoginDto, SignupDto } from './dto/auth.dto';
 import { UserService } from '../models/user/user.service';
-import { comparePasswords, getTokenKey, hashPassword, RoleCode } from '../common/helpers';
+import {
+  comparePasswords,
+  getTokenKey,
+  hashPassword,
+  RoleCode,
+  validateTokenData,
+} from '../common/helpers';
 import * as _ from 'lodash';
 import { User } from '../models/user/schemas/user.schema';
 import { configService } from '../config/config.service';
@@ -19,6 +26,7 @@ import { readFile } from 'fs';
 import { KeystoreService } from '../models/keystore/keystore.service';
 import { Keystore } from '../models/keystore/schemas/keystore.schema';
 import { Tokens } from '../types/app-request';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -90,8 +98,49 @@ export class AuthService {
     return { logout: true };
   }
 
-  refresh() {
-    throw new Error('Method not implemented.');
+  async refresh(accessToken: string, refreshToken: string) {
+    const filePath = path.join(__dirname, '../../keys/public.pem');
+    const cert = await promisify(readFile)(filePath, 'utf8');
+    if (!cert) {
+      throw new InternalServerErrorException({ key: 'auth.error.token_verification_failure' });
+    }
+
+    const accessTokenPayload = this.jwtService.verify<JwtPayload>(accessToken, {
+      publicKey: cert,
+    });
+    validateTokenData(accessTokenPayload);
+
+    const { sub: accessTokenSub, prm: accessTokenPrm } = accessTokenPayload;
+
+    const user = await this.userService.findById(new Types.ObjectId(accessTokenSub));
+    if (!user) throw new NotFoundException({ key: 'auth.error.user_not_registered' });
+    //req.user = user;
+
+    const refreshTokenPayload = this.jwtService.verify<JwtPayload>(refreshToken, {
+      publicKey: cert,
+    });
+    validateTokenData(accessTokenPayload);
+
+    const { sub: refreshTokenSub, prm: refreshTokenPrm } = refreshTokenPayload;
+
+    if (accessTokenSub !== refreshTokenSub) {
+      throw new UnauthorizedException({ key: 'auth.error.invalid_access_token' });
+    }
+
+    const keystore = await this.keystoreService.find(user, accessTokenPrm, refreshTokenPrm);
+    if (!keystore) throw new NotFoundException({ key: 'auth.error.invalid_token' });
+    await this.keystoreService.remove(keystore._id);
+
+    const accessTokenKey = getTokenKey();
+    const refreshTokenKey = getTokenKey();
+
+    await this.keystoreService.create(user, accessTokenKey, refreshTokenKey);
+    const tokens = await this.generateTokens(user, accessTokenKey, refreshTokenKey);
+
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    };
   }
 
   private async generateTokens(
