@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty, MaxLength, MinLength, IsOptional } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, MinLength, IsOptional } from 'class-validator';
 
 export class LoginDto {
   @IsString()
@@ -29,14 +29,14 @@ export class SignupDto {
 
   @IsString()
   @IsOptional()
-  profilePicUrl: string;
+  profile_pic_url: string;
 }
 
 
 export class RefreshTokenDto {
   @IsNotEmpty()
   @IsString()
-  refreshToken: string;
+  refresh_token: string;
 }
 
 export class ForgotPasswordDto {

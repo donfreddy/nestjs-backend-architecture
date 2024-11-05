@@ -38,6 +38,6 @@ export class AuthController {
   @ApiResponse({ key: 'auth.success.token_issued' }, HttpStatus.OK)
   async refresh(@Req() req: ProtectedRequest, @Body() inputs: RefreshTokenDto) {
     const accessToken = getAccessToken(req.headers.authorization);
-    return this.authService.refresh(accessToken, inputs.refreshToken);
+    return this.authService.refresh(accessToken, inputs.refresh_token);
   }
 }

@@ -19,10 +19,10 @@ export class Keystore {
   @Prop({ default: true })
   status: boolean;
 
-  @Prop({ name: 'created_at' })
+  @Prop({ alias: 'created_at' })
   createdAt: Date;
 
-  @Prop({ name: 'updated_at' })
+  @Prop({ alias: 'updated_at' })
   updatedAt: Date;
 }
 

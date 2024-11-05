@@ -9,7 +9,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiResponse, IMessage } from '../interfaces';
-import { StatusCode } from '../helpers';
+import { camelToSnakeCase, StatusCode } from '../helpers';
 import { I18nService } from 'nestjs-i18n';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 
@@ -35,13 +35,28 @@ export function ApiResponseInterceptor<T>(msg: IMessage): Type<InterceptApiRespo
         map((data: T) => ({
           status_code: StatusCode.SUCCESS,
           message: message,
-          data: JSON.parse(
-            JSON.stringify(data, (_, value) =>
-              value && value._bsontype === 'ObjectID' ? value.toString() : value,
+          data: this.convertToSnakeCase(
+            JSON.parse(
+              JSON.stringify(data, (_, value) =>
+                value && value._bsontype === 'ObjectID' ? value.toString() : value,
+              ),
             ),
           ),
         })),
       );
+    }
+
+    private convertToSnakeCase(data: any): any {
+      if (Array.isArray(data)) {
+        return data.map((item) => this.convertToSnakeCase(item));
+      } else if (data !== null && typeof data === 'object') {
+        const result = {};
+        Object.keys(data).forEach((key) => {
+          result[camelToSnakeCase(key)] = this.convertToSnakeCase(data[key]);
+        });
+        return result;
+      }
+      return data;
     }
   }
 

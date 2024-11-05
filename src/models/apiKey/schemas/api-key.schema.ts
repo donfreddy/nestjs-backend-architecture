@@ -30,10 +30,10 @@ export class ApiKey {
   @Prop({ default: true })
   status: boolean;
 
-  @Prop({ name: 'created_at' })
+  @Prop()
   createdAt: Date;
 
-  @Prop({ name: 'updated_at' })
+  @Prop()
   updatedAt: Date;
 }
 

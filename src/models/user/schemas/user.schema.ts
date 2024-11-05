@@ -16,7 +16,7 @@ export class User {
   @Prop()
   password: string;
 
-  @Prop({ name: 'profile_pic_url' })
+  @Prop()
   profilePicUrl: string;
 
   @Prop({ type: [{ type: Schema2.Types.ObjectId, ref: 'Role' }] })
@@ -28,10 +28,10 @@ export class User {
   @Prop({ default: true })
   status: boolean;
 
-  @Prop({ name: 'created_at' })
+  @Prop()
   createdAt: Date;
 
-  @Prop({ name: 'updated_at' })
+  @Prop()
   updatedAt: Date;
 }
 
