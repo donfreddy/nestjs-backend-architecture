@@ -10,5 +10,5 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsUrl()
   @IsString()
   @IsOptional()
-  readonly profilePicUrl?: string;
+  readonly profile_pic_url?: string;
 }

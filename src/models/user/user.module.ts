@@ -5,6 +5,8 @@ import { User, UserSchema } from './schemas/user.schema';
 import { ProfileController } from './profile.controller';
 import { RoleModule } from '../role/role.module';
 import { KeystoreModule } from '../keystore/keystore.module';
+import { UserController } from './user.controller';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -12,8 +14,8 @@ import { KeystoreModule } from '../keystore/keystore.module';
     RoleModule,
     KeystoreModule,
   ],
-  controllers: [ProfileController],
-  providers: [UserService],
+  controllers: [UserController, ProfileController],
+  providers: [UserService, JwtService],
   exports: [UserService, RoleModule, KeystoreModule],
 })
 export class UserModule {}

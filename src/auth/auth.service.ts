@@ -99,7 +99,7 @@ export class AuthService {
   }
 
   async refresh(accessToken: string, refreshToken: string) {
-    const filePath = path.join(__dirname, '../../../keys/public.pem');
+    const filePath = path.join(__dirname, '../../keys/public.pem');
     const cert = await promisify(readFile)(filePath, 'utf8');
     if (!cert) {
       throw new InternalServerErrorException({ key: 'auth.error.token_verification_failure' });

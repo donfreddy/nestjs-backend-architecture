@@ -1,24 +1,38 @@
-import { Get, Body, Param, Controller, Put } from '@nestjs/common';
+import { Get, Body, Controller, Put, Req, UseGuards, Param } from '@nestjs/common';
 import { UserService } from './user.service';
+import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './schemas/user.schema';
+import { ProtectedRequest } from '../../types/app-request';
+import { ApiResponse, Permission } from '../../common/decorators';
+import { PermissionEnum } from '../../common/helpers';
+import { AuthGuard } from '../../common/guards';
+import { FindByIdDto } from '../../common/dtos/find-by-id.dto';
 
-@Controller('profile')
+@Controller({ path: 'profile', version: '1' })
 export class ProfileController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/my')
-  getMyProfile() {
-    return this.userService.findAll();
+  @Get()
+  @Permission(PermissionEnum.GENERAL)
+  @UseGuards(AuthGuard)
+  @ApiResponse({ key: 'common.success' })
+  getPrivateProfile(@Req() req: ProtectedRequest): Promise<Partial<User>> {
+    return this.userService.getPrivateProfile(req.user._id);
   }
 
-  // Get public profile by id
-  @Get('/public/:id')
-  getPublicProfile(@Param('id') id: string) {
-    //return this.userService.findOne(+id);
+  @Get('public/:id')
+  @Permission(PermissionEnum.GENERAL)
+  @ApiResponse({ key: 'common.success' })
+  getPublicProfile(@Param() params: FindByIdDto): Promise<Partial<User>> {
+    return this.userService.getPublicProfile(new Types.ObjectId(params.id));
   }
 
-  @Put('')
-  updateProfile(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    //return this.userService.update(+id, updateUserDto);
+  @Put()
+  @Permission(PermissionEnum.GENERAL)
+  @UseGuards(AuthGuard)
+  @ApiResponse({ key: 'auth.success.profile_updated' })
+  updateProfile(@Req() req: ProtectedRequest, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.updateProfile(req.user._id, updateUserDto);
   }
 }

@@ -1,10 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model, Types } from 'mongoose';
+import * as _ from 'lodash';
 import { Keystore } from '../keystore/schemas/keystore.schema';
 import { RoleService } from '../role/role.service';
 import { KeystoreService } from '../keystore/keystore.service';
+import { LoginDto } from '../../auth/dto/auth.dto';
+import { hashPassword } from '../../common/helpers';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -71,5 +75,66 @@ export class UserService {
 
   async findAll(): Promise<User[]> {
     return this.model.find().exec();
+  }
+
+  async updateInfo(user: User): Promise<any> {
+    user.updatedAt = new Date();
+    return this.model
+      .updateOne({ _id: user._id }, { $set: { ...user } })
+      .lean()
+      .exec();
+  }
+
+  async findPrivateProfileById(id: Types.ObjectId): Promise<User | null> {
+    return this.model
+      .findOne({ _id: id, status: true })
+      .select('+email')
+      .populate({
+        path: 'roles',
+        match: { status: true },
+        select: { code: 1 },
+      })
+      .lean<User>()
+      .exec();
+  }
+
+  async assign(inputs: LoginDto): Promise<Partial<User>> {
+    const user = await this.findByEmail(inputs.email);
+    if (!user) throw new BadRequestException({ key: 'auth.error.user_not_exist' });
+
+    const passwordHash = await hashPassword(inputs.password);
+
+    await this.updateInfo({ _id: user._id, password: passwordHash } as User);
+
+    await this.keystoreService.removeAllForClient(user);
+
+    return _.pick(user, ['_id', 'name', 'email']);
+  }
+
+  async getPrivateProfile(userId: Types.ObjectId): Promise<Partial<User>> {
+    const user = await this.findPrivateProfileById(userId);
+    if (!user) throw new BadRequestException({ key: 'auth.error.user_not_registered' });
+
+    return _.pick(user, ['name', 'email', 'profilePicUrl', 'roles']);
+  }
+
+  async updateProfile(userId: Types.ObjectId, inputs: UpdateUserDto): Promise<Partial<User>> {
+    const user = await this.findPrivateProfileById(userId);
+    if (!user) throw new BadRequestException({ key: 'auth.error.user_not_registered' });
+
+    const { name, profile_pic_url: profilePicUrl } = inputs;
+
+    if (name) user.name = name;
+    if (profilePicUrl) user.profilePicUrl = profilePicUrl;
+
+    await this.updateInfo(user);
+    return _.pick(user, ['name', 'profilePicUrl']);
+  }
+
+  async getPublicProfile(userId: Types.ObjectId): Promise<Partial<User>> {
+    const user = await this.findPrivateProfileById(userId);
+    if (!user) throw new BadRequestException({ key: 'auth.error.user_not_registered' });
+
+    return _.pick(user, ['name', 'profilePicUrl']);
   }
 }
