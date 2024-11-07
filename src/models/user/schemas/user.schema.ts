@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as Schema2, Types } from 'mongoose';
+import { HydratedDocument, Schema as Schema2, Types } from 'mongoose';
 import { Role } from '../../role/schemas/role.schema';
 
 @Schema({ collection: 'users' })
@@ -37,11 +37,11 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-export type UserDocument = User & Document;
+export type UserDocument = HydratedDocument<User>;
 
 // Remove the _id field and __v field from the returned object
 UserSchema.set('toJSON', {
-  transform: (doc, ret) => {
+  transform: (_doc: UserDocument, ret: Record<string, any>): void => {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
