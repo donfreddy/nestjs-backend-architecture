@@ -1,22 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as Schema2, Types } from 'mongoose';
+import { HydratedDocument, Schema as Schema2 } from 'mongoose';
 import { User } from '../../user/schemas/user.schema';
 
-@Schema({ collection: 'blogs' })
+@Schema({ collection: 'blogs', versionKey: false })
 export class Blog {
-  @Prop({ type: Schema2.Types.ObjectId, auto: true })
-  readonly _id: Types.ObjectId;
-
   @Prop({ required: true, maxlength: 500 })
   title: string;
 
   @Prop({ required: true, maxlength: 2000 })
   description: string;
 
-  @Prop()
+  @Prop({ required: false, select: false })
   text: string;
 
-  @Prop()
+  @Prop({ required: true, select: false })
   draftText: string;
 
   @Prop({ uppercase: true })
@@ -49,19 +46,25 @@ export class Blog {
   @Prop({ required: false, index: true })
   publishedAt: Date;
 
-  @Prop({ default: true })
+  @Prop({ default: true, select: false })
   status: boolean;
 
-  @Prop({ type: Schema2.Types.ObjectId, ref: 'User', required: true, index: true })
+  @Prop({
+    type: Schema2.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    select: false,
+    index: true,
+  })
   createdBy: User;
 
-  @Prop({ type: Schema2.Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: Schema2.Types.ObjectId, ref: 'User', required: true, select: false })
   updatedBy: User;
 
-  @Prop()
+  @Prop({ default: Date.now, select: false })
   createdAt: Date;
 
-  @Prop()
+  @Prop({ default: Date.now, select: false })
   updatedAt: Date;
 }
 
@@ -69,11 +72,12 @@ export const BlogSchema = SchemaFactory.createForClass(Blog);
 
 export type BlogDocument = HydratedDocument<Blog>;
 
-// Remove the _id field and __v field from the returned object
-BlogSchema.set('toJSON', {
-  transform: (_doc: BlogDocument, ret: Record<string, any>): void => {
-    ret.id = ret._id;
-    delete ret._id;
-    delete ret.__v;
-  },
-});
+BlogSchema.index(
+  { title: 'text', description: 'text' },
+  { weights: { title: 3, description: 1 }, background: false },
+);
+BlogSchema.index({ _id: 1, status: 1 });
+BlogSchema.index({ blogUrl: 1, status: 1 });
+BlogSchema.index({ isPublished: 1, status: 1 });
+BlogSchema.index({ _id: 1, isPublished: 1, status: 1 });
+BlogSchema.index({ tag: 1, isPublished: 1, status: 1 });

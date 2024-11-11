@@ -13,7 +13,7 @@ import { BlogModule } from './models/blog/blog.module';
 import { DatabaseModule } from './database/database.module';
 import { ApikeyMiddleware, LogsMiddleware } from './common/middlewares';
 import { configService } from './config/config.service';
-import { PermissionGuard } from './common/guards/permission.guard';
+import { PermissionGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
 
 @Module({

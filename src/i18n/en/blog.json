@@ -1,0 +1,17 @@
+{
+  "blog_url_already_exists": "Blog with URL already exists",
+  "blog_url_already_used": "Blog URL already used",
+  "blog_not_exist": "Blog does not exist",
+  "blog_not_found": "Blog not found",
+  "blog_not_available": "Blog is not available",
+  "blog_created": "Blog created successfully",
+  "blog_updated": "Blog updated successfully",
+  "blog_deleted": "Blog deleted successfully",
+  "blog_submitted": "Blog submitted successfully",
+  "blog_withdrawn": "Blog withdrawn successfully",
+  "blog_published": "Blog published successfully",
+  "blog_unpublished": "Blog unpublished successfully",
+  "blog_not_published": "Blog not published",
+  "not_have_permission": "You don't have necessary permissions",
+  "blog_private": "This blog is private"
+}

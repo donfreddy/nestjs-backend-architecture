@@ -1,11 +1,10 @@
 export interface ApiResponse<T> {
-  data: T;
+  data: T | ApiPaginatedResponse<T>;
 }
 
 export interface ApiPaginatedResponse<T> {
   items: T[];
   meta: PaginationMeta;
-  links: PaginationLinks;
 }
 
 export interface PaginationMeta {
@@ -17,15 +16,7 @@ export interface PaginationMeta {
   has_previous: boolean;
 }
 
-export interface PaginationLinks {
-  first: string;
-  previous: string;
-  next: string;
-  last: string;
-}
-
 export interface PaginationOpts {
   page: number;
   limit: number;
-  route?: string;
 }

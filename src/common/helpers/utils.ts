@@ -82,6 +82,9 @@ export const getLogLevels = (isProduction: boolean): LogLevel[] => {
   return ['error', 'warn', 'log', 'verbose', 'debug'];
 };
 
+export const formatEndpoint = (endpoint: string) =>
+  endpoint.replace(/\s/g, '').replace(/\//g, '-').replace(/\?/g, '');
+
 export function camelToSnakeCase(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
 }
