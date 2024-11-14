@@ -1,8 +1,9 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module } from '@nestjs/common';
 import { HeaderResolver, I18nModule } from 'nestjs-i18n';
 import * as path from 'path';
 import * as helmet from 'helmet';
 import cors from 'cors';
+import { redisStore } from 'cache-manager-redis-yet';
 import { AppController } from './app.controller';
 import { UserModule } from './models/user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -15,6 +16,8 @@ import { ApikeyMiddleware, LogsMiddleware } from './common/middlewares';
 import { configService } from './config/config.service';
 import { PermissionGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
+import { CacheModule, CacheStore } from '@nestjs/cache-manager';
+import { BlogCacheService } from './cache/blog-cache.service';
 
 @Module({
   imports: [
@@ -28,6 +31,20 @@ import { APP_GUARD } from '@nestjs/core';
         watch: true, // Enable live translations
       },
       resolvers: [new HeaderResolver(['x-custom-lang'])],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => {
+        const { host, port, password } = configService.getRedis();
+        const store = await redisStore({
+          url: `redis://:${password}@${host}:${port}`,
+        });
+
+        return {
+          store: store as unknown as CacheStore,
+          ttl: 10 * 60000, // 10 minutes (milliseconds)
+        };
+      },
     }),
 
     /**
@@ -46,6 +63,7 @@ import { APP_GUARD } from '@nestjs/core';
       provide: APP_GUARD,
       useClass: PermissionGuard,
     },
+    BlogCacheService,
   ],
   controllers: [AppController],
 })

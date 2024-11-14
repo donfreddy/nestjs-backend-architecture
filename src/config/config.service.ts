@@ -78,7 +78,7 @@ class ConfigService {
 
   public getCaching() {
     return {
-      contentCacheDuration: parseInt(this.getValue('CONTENT_CACHE_DURATION_MILLIS') || '0'),
+      contentCacheDuration: parseInt(this.getValue('CONTENT_CACHE_DURATION_MILLIS') || '600000'),
     };
   }
 }

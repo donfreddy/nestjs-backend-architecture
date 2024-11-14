@@ -7,10 +7,15 @@ import { Blog, BlogDocument } from './schemas/blog.schema';
 import { formatEndpoint } from '../../common/helpers';
 import { Types } from 'mongoose';
 import { ApiPaginatedResponse, PaginationOpts } from '../../common/interfaces';
+import { BlogCacheService } from '../../cache/blog-cache.service';
 
 @Injectable()
 export class BlogService {
-  constructor(private blogRepo: BlogRepository) {}
+  constructor(private blogCache: BlogCacheService, private blogRepo: BlogRepository) {}
+
+  private getCacheKey(blogKey: string): string {
+    return `blog:${blogKey}`;
+  }
 
   async create(user: User, inputs: CreateBlogDto): Promise<BlogDocument> {
     const blogUrl = formatEndpoint(inputs.blog_url);
@@ -156,20 +161,31 @@ export class BlogService {
   }
 
   async findPublishedByUrl(endpoint: string): Promise<BlogDocument> {
-    const blog = await this.blogRepo.findPublishedByUrl(endpoint);
-    if (!blog) throw new BadRequestException({ key: 'blog.blog_not_found' });
+    let blog = await this.blogCache.getBlogByUrl(endpoint);
 
+    if (!blog) {
+      blog = await this.blogRepo.findPublishedByUrl(endpoint);
+      if (blog) await this.blogCache.setBlogByUrl(endpoint, blog);
+    }
+
+    if (!blog) throw new BadRequestException({ key: 'blog.blog_not_found' });
     return blog;
   }
 
   async findPublishedById(id: string): Promise<BlogDocument> {
-    const blog = await this.blogRepo.findInfoForPublishedById(new Types.ObjectId(id));
-    if (!blog) throw new BadRequestException({ key: 'blog.blog_not_found' });
+    const blogId = new Types.ObjectId(id);
+    let blog = await this.blogCache.getBlogById(blogId);
 
+    if (!blog) {
+      blog = await this.blogRepo.findInfoForPublishedById(blogId);
+      if (blog) await this.blogCache.setBlogById(id, blog);
+    }
+
+    if (!blog) throw new BadRequestException({ key: 'blog.blog_not_found' });
     return blog;
   }
 
-  async findByTag(tag: string, options: PaginationOpts): Promise<ApiPaginatedResponse<Blog>>  {
+  async findByTag(tag: string, options: PaginationOpts): Promise<ApiPaginatedResponse<Blog>> {
     return await this.blogRepo.findByTagAndPaginated(tag, options);
   }
 
@@ -185,10 +201,15 @@ export class BlogService {
 
   async similar(id: string): Promise<BlogDocument[]> {
     const blogId = new Types.ObjectId(id);
-    const blog = await this.blogRepo.findInfoForPublishedById(blogId);
-    if (!blog) throw new BadRequestException({ key: 'blog.blog_not_available' });
+    let blogs = await this.blogCache.getSimilarBlogs(blogId);
 
-    const blogs = await this.blogRepo.searchSimilarBlogs(blog, 6);
+    if (!blogs) {
+      const blog = await this.blogRepo.findInfoForPublishedById(blogId);
+      if (!blog) throw new BadRequestException({ key: 'blog.blog_not_available' });
+      blogs = await this.blogRepo.searchSimilarBlogs(blog, 6);
+
+      if (blogs && blogs.length > 0) await this.blogCache.setSimilarBlogs(blogId, blogs);
+    }
 
     return blogs ? blogs : [];
   }

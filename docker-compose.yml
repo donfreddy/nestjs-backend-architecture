@@ -52,7 +52,7 @@ services:
       - db_data:/data/db
 
   redis:
-    image: redis:7.2.3
+    image: redis/redis-stack-server:latest
     container_name: redis
     restart: unless-stopped
     env_file: .env
