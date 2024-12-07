@@ -1,5 +1,5 @@
 import { Logger, MiddlewareConsumer, Module } from '@nestjs/common';
-import { HeaderResolver, I18nModule } from 'nestjs-i18n';
+import { HeaderResolver, I18nJsonLoader, I18nModule } from 'nestjs-i18n';
 import * as path from 'path';
 import * as helmet from 'helmet';
 import cors from 'cors';
@@ -30,6 +30,7 @@ import { BlogCacheService } from './cache/blog-cache.service';
         path: path.join(__dirname, '/i18n/'),
         watch: true, // Enable live translations
       },
+      loader: I18nJsonLoader,
       resolvers: [new HeaderResolver(['x-custom-lang'])],
     }),
     CacheModule.registerAsync({
